@@ -1,2 +1,2 @@
 "Client","Application","Version","DeploymentStatus","DeploymentDateTime","TriggeredBy"
-"QRMO","Recon","2.26.0608.234","Failed","2026-06-12 17:00:10 UTC","MeghaPerumal"
+"CLIENT_A","APP_ALPHA","1.0.0","Succeeded","2026-06-15 09:00:00 UTC","john.doe"
