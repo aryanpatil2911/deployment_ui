@@ -1,3 +1,6 @@
+const deploymentLogsPath = "../DeploymentLogs";
+const deploymentLogsIndexUrl = `${deploymentLogsPath}/index.json`;
+
 let deployments = [];
 
 function parseCSV(text) {
@@ -28,17 +31,30 @@ function parseCSV(text) {
 async function loadData() {
     try {
 
-        const files =
-            await fetch("./applications/index.json")
-            .then(res => res.json());
+        const indexResponse = await fetch(deploymentLogsIndexUrl);
+
+        if (!indexResponse.ok) {
+            throw new Error(`Unable to load ${deploymentLogsIndexUrl}`);
+        }
+
+        const folderItems = await indexResponse.json();
+        const files = (Array.isArray(folderItems) ? folderItems : folderItems.files || [])
+            .filter(fileName =>
+                typeof fileName === "string" &&
+                fileName.toLowerCase().endsWith(".csv")
+            );
 
         deployments = [];
 
         for (const file of files) {
 
-            const text =
-                await fetch(`./applications/${file}`)
-                .then(res => res.text());
+            const fileResponse = await fetch(`${deploymentLogsPath}/${file}`);
+
+            if (!fileResponse.ok) {
+                continue;
+            }
+
+            const text = await fileResponse.text();
 
             deployments.push(...parseCSV(text));
         }
