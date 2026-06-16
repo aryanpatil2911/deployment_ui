@@ -177,8 +177,45 @@ function renderTable() {
     `;
 }
 
-// ==================== ACTION HANDLERS ====================
+// ==================== CUSTOM MODAL ====================
+function showModal(message, type = 'info') {
+    let modal = document.getElementById('custom-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'custom-modal';
+        modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden';
+        modal.innerHTML = `
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md mx-4 overflow-hidden shadow-2xl">
+                <div class="p-8 text-center">
+                    <div id="modal-icon" class="text-5xl mb-6"></div>
+                    <p id="modal-message" class="text-slate-200 text-lg"></p>
+                </div>
+                <div class="border-t border-slate-700 p-4">
+                    <button onclick="closeModal()" 
+                            class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-white font-medium transition-colors">
+                        OK
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
 
+    const icon = document.getElementById('modal-icon');
+    icon.innerHTML = type === 'error' 
+        ? `<i class="fa-solid fa-circle-exclamation text-red-500"></i>` 
+        : `<i class="fa-solid fa-circle-info text-amber-400"></i>`;
+
+    document.getElementById('modal-message').textContent = message;
+    modal.classList.remove('hidden');
+}
+
+function closeModal() {
+    const modal = document.getElementById('custom-modal');
+    if (modal) modal.classList.add('hidden');
+}
+
+// ==================== ACTION HANDLERS ====================
 function handleRollback(client, app, version, env) {
     const url = `https://github.com/YOUR_ORG/YOUR_REPO/issues/new?template=rollback-config.yml&title=Rollback ${client}-${app} v${version}&body=Rollback Request%0A%0AClient: ${client}%0AApplication: ${app}%0AVersion: ${version}%0AEnvironment: ${env}%0AReason: [Add reason here]`;
     window.open(url, '_blank');
@@ -195,7 +232,7 @@ function handleUpgrade(client, app, currentVersion, isProd) {
 
     const options = getUpgradableVersions(app, currentVersion, isProd);
     if (options.length === 0) {
-        alert("No higher versions available.");
+        showModal("No higher versions available for this application.", "error");
         return;
     }
 
@@ -214,10 +251,10 @@ function confirmUpgrade(select, client, app, oldVersion) {
     const url = `https://github.com/YOUR_ORG/YOUR_REPO/issues/new?template=upgrade-version.yml&title=Upgrade ${client}-${app} from v${oldVersion} to v${newVersion}&body=Upgrade Request%0A%0AClient: ${client}%0AApplication: ${app}%0ACurrent Version: ${oldVersion}%0ATarget Version: ${newVersion}`;
     window.open(url, '_blank');
 
-    // Reset cell after action
+    // Reset cell
     setTimeout(() => {
         select.outerHTML = oldVersion;
-    }, 500);
+    }, 600);
 }
 
 // Event Listeners
