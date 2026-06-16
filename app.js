@@ -23,15 +23,12 @@ function parseCSV(text) {
 async function loadData() {
     try {
         const indexResponse = await fetch(deploymentLogsIndexUrl);
-        if (!indexResponse.ok) {
-            throw new Error(`Unable to load ${deploymentLogsIndexUrl}`);
-        }
+        if (!indexResponse.ok) throw new Error(`Unable to load ${deploymentLogsIndexUrl}`);
+
         const folderItems = await indexResponse.json();
         const files = (Array.isArray(folderItems) ? folderItems : folderItems.files || [])
-            .filter(fileName =>
-                typeof fileName === "string" &&
-                fileName.toLowerCase().endsWith(".csv")
-            );
+            .filter(fileName => typeof fileName === "string" && fileName.toLowerCase().endsWith(".csv"));
+
         deployments = [];
         for (const file of files) {
             const fileResponse = await fetch(`${deploymentLogsPath}/${file}`);
@@ -39,12 +36,13 @@ async function loadData() {
             const text = await fileResponse.text();
             deployments.push(...parseCSV(text));
         }
+
         loadFilters();
         renderTable();
     } catch (error) {
         console.error(error);
-        document.getElementById("tableContainer").innerHTML =
-            "<div class='text-red-500'>Failed to load data</div>";
+        document.getElementById("tableContainer").innerHTML = 
+            `<div class="text-red-500 text-center py-12">Failed to load deployment data</div>`;
     }
 }
 
@@ -74,57 +72,64 @@ function renderTable() {
 
     const rows = deployments.filter(row => {
         const matchSearch = !search ||
-            row.Client?.toLowerCase().includes(search) ||
-            row.Application?.toLowerCase().includes(search) ||
-            row.Version?.toLowerCase().includes(search) ||
-            row.Environment?.toLowerCase().includes(search);
+            (row.Client && row.Client.toLowerCase().includes(search)) ||
+            (row.Application && row.Application.toLowerCase().includes(search)) ||
+            (row.Version && row.Version.toLowerCase().includes(search)) ||
+            (row.Environment && row.Environment.toLowerCase().includes(search));
 
-        return (
-            matchSearch &&
+        return matchSearch &&
             (!client || row.Client === client) &&
             (!application || row.Application === application) &&
             (!version || row.Version === version) &&
-            (!environment || row.Environment === environment)
-        );
+            (!environment || row.Environment === environment);
     });
 
     document.getElementById("tableContainer").innerHTML = `
-        <table class="w-full border border-slate-800">
+        <table class="w-full">
             <thead>
-                <tr class="bg-slate-900">
-                    <th class="p-3 text-left">Client</th>
-                    <th class="p-3 text-left">Application</th>
-                    <th class="p-3 text-left">Version</th>
-                    <th class="p-3 text-left">Environment</th>
-                    <th class="p-3 text-left">Status</th>
-                    <th class="p-3 text-left">Deployment Time</th>
-                    <th class="p-3 text-left">Triggered By</th>
+                <tr class="bg-slate-900 border-b border-slate-700">
+                    <th class="p-4 text-left font-medium text-slate-300">Client</th>
+                    <th class="p-4 text-left font-medium text-slate-300">Application</th>
+                    <th class="p-4 text-left font-medium text-slate-300">Version</th>
+                    <th class="p-4 text-left font-medium text-slate-300">Environment</th>
+                    <th class="p-4 text-left font-medium text-slate-300">Status</th>
+                    <th class="p-4 text-left font-medium text-slate-300">Deployment Time</th>
+                    <th class="p-4 text-left font-medium text-slate-300">Triggered By</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-slate-800">
                 ${rows.map(row => `
-                    <tr class="border-t border-slate-800">
-                        <td class="p-3">${row.Client || "-"}</td>
-                        <td class="p-3">${row.Application || "-"}</td>
-                        <td class="p-3">${row.Version || "-"}</td>
-                        <td class="p-3 font-medium ${row.Environment === 'PROD' ? 'text-amber-400' : 'text-blue-400'}">
-                            ${row.Environment || "-"}
+                    <tr class="hover:bg-slate-800/70 transition-colors table-row">
+                        <td class="p-4">${row.Client || "-"}</td>
+                        <td class="p-4">${row.Application || "-"}</td>
+                        <td class="p-4 font-mono">${row.Version || "-"}</td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-medium ${
+                                row.Environment === 'PROD'
+                                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' 
+                                    : 'bg-blue-500/20 text-blue-400'
+                            }">
+                                ${row.Environment || "-"}
+                            </span>
                         </td>
-                        <td class="p-3 ${
-                            row.DeploymentStatus === "Succeeded"
-                            ? "text-green-500" : "text-red-500"
-                        }">
-                            ${row.DeploymentStatus || "-"}
+                        <td class="p-4">
+                            <span class="${
+                                row.DeploymentStatus === "Succeeded"
+                                    ? "text-emerald-500" 
+                                    : "text-red-500"
+                            } font-medium">
+                                ${row.DeploymentStatus || "-"}
+                            </span>
                         </td>
-                        <td class="p-3">${row.DeploymentDateTime || "-"}</td>
-                        <td class="p-3">${row.TriggeredBy || "-"}</td>
+                        <td class="p-4 text-slate-400">${row.DeploymentDateTime || "-"}</td>
+                        <td class="p-4 text-slate-400">${row.TriggeredBy || "-"}</td>
                     </tr>
                 `).join("")}
             </tbody>
         </table>
-        <div class="mt-3 text-slate-400">
-            Showing ${rows.length} of ${deployments.length} deployments
-        </div>
+        ${rows.length === 0 ? 
+            `<div class="text-center py-12 text-slate-400">No deployments found</div>` : 
+            ''}
     `;
 }
 
@@ -135,4 +140,5 @@ document.getElementById("applicationFilter").addEventListener("change", renderTa
 document.getElementById("versionFilter").addEventListener("change", renderTable);
 document.getElementById("environmentFilter").addEventListener("change", renderTable);
 
+// Initial load
 loadData();

@@ -3,38 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deployment Dashboard</title>
+<title>Linedata | Deployment Dashboard</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<style>
+    input:focus, select:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.3); /* Red accent ring */
+        border-color: #f87171;
+    }
+    .table-row:hover {
+        background-color: #1f2937;
+    }
+</style>
 </head>
 <body class="bg-slate-950 text-slate-200 min-h-screen">
 <div class="max-w-7xl mx-auto p-6">
-    <h1 class="text-3xl font-bold mb-6">
-        Deployment Dashboard
-    </h1>
-    <div class="flex flex-wrap gap-3 mb-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-4xl font-bold tracking-tight flex items-center gap-3">
+            <span class="text-red-500">●</span>
+            Linedata Deployment Dashboard
+        </h1>
+        <div class="text-sm text-slate-400">Platform Development Team</div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-3 mb-8 bg-slate-900 p-4 rounded-2xl border border-slate-800">
         <input
             id="search"
             type="text"
-            placeholder="Search client, application, or version..."
-            class="bg-slate-900 border border-slate-700 px-3 py-2 rounded flex-grow min-w-[200px]"
+            placeholder="Search client, application, version..."
+            class="bg-slate-800 border border-slate-700 focus:border-red-500 px-4 py-3 rounded-xl flex-grow min-w-[280px] text-sm"
         >
-        <select id="clientFilter" class="bg-slate-900 border border-slate-700 px-3 py-2 rounded">
+        <select id="clientFilter" class="bg-slate-800 border border-slate-700 px-4 py-3 rounded-xl text-sm">
             <option value="">All Clients</option>
         </select>
-        <select id="applicationFilter" class="bg-slate-900 border border-slate-700 px-3 py-2 rounded">
+        <select id="applicationFilter" class="bg-slate-800 border border-slate-700 px-4 py-3 rounded-xl text-sm">
             <option value="">All Applications</option>
         </select>
-        <select id="versionFilter" class="bg-slate-900 border border-slate-700 px-3 py-2 rounded">
+        <select id="versionFilter" class="bg-slate-800 border border-slate-700 px-4 py-3 rounded-xl text-sm">
             <option value="">All Versions</option>
         </select>
-        <select id="environmentFilter" class="bg-slate-900 border border-slate-700 px-3 py-2 rounded">
+        <select id="environmentFilter" class="bg-slate-800 border border-slate-700 px-4 py-3 rounded-xl text-sm">
             <option value="">All Environments</option>
         </select>
     </div>
-    <div id="tableContainer">
-        <div class="text-center py-8">Loading deployment data...</div>
+
+    <!-- Table Container -->
+    <div id="tableContainer" class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden">
+        <div class="text-center py-12 text-slate-400">Loading deployment data...</div>
     </div>
 </div>
+
 <script src="app.js"></script>
 </body>
 </html>
