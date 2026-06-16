@@ -101,6 +101,15 @@ function fillSelect(id, values) {
         });
 }
 
+function clearFilters() {
+    document.getElementById("search").value = "";
+    document.getElementById("clientFilter").value = "";
+    document.getElementById("applicationFilter").value = "";
+    document.getElementById("versionFilter").value = "";
+    document.getElementById("environmentFilter").value = "";
+    renderTable();
+}
+
 function renderTable() {
     const search = document.getElementById("search").value.toLowerCase();
     const client = document.getElementById("clientFilter").value;
@@ -200,12 +209,10 @@ function showModal(message, type = 'info') {
         `;
         document.body.appendChild(modal);
     }
-
     const icon = document.getElementById('modal-icon');
     icon.innerHTML = type === 'error' 
         ? `<i class="fa-solid fa-circle-exclamation text-red-500"></i>` 
         : `<i class="fa-solid fa-circle-info text-amber-400"></i>`;
-
     document.getElementById('modal-message').textContent = message;
     modal.classList.remove('hidden');
 }
@@ -229,32 +236,35 @@ function handlePromote(client, app, version) {
 function handleUpgrade(client, app, currentVersion, isProd) {
     const cell = document.getElementById(`version-cell-${client}-${app}`);
     if (!cell) return;
-
     const options = getUpgradableVersions(app, currentVersion, isProd);
     if (options.length === 0) {
         showModal("No higher versions available for this application.", "error");
         return;
     }
-
     let html = `<select onchange="confirmUpgrade(this, '${client}', '${app}', '${currentVersion}')" class="bg-slate-800 border border-blue-500 text-white px-3 py-1 rounded text-sm">`;
     html += `<option value="">Select version...</option>`;
     options.forEach(v => html += `<option value="${v}">${v}</option>`);
     html += `</select>`;
-
     cell.innerHTML = html;
 }
 
 function confirmUpgrade(select, client, app, oldVersion) {
     const newVersion = select.value;
     if (!newVersion) return;
-
     const url = `https://github.com/YOUR_ORG/YOUR_REPO/issues/new?template=upgrade-version.yml&title=Upgrade ${client}-${app} from v${oldVersion} to v${newVersion}&body=Upgrade Request%0A%0AClient: ${client}%0AApplication: ${app}%0ACurrent Version: ${oldVersion}%0ATarget Version: ${newVersion}`;
     window.open(url, '_blank');
-
-    // Reset cell
     setTimeout(() => {
         select.outerHTML = oldVersion;
     }, 600);
+}
+
+function clearFilters() {
+    document.getElementById("search").value = "";
+    document.getElementById("clientFilter").value = "";
+    document.getElementById("applicationFilter").value = "";
+    document.getElementById("versionFilter").value = "";
+    document.getElementById("environmentFilter").value = "";
+    renderTable();
 }
 
 // Event Listeners
