@@ -17,7 +17,7 @@
     </style>
 </head>
 <body class="text-slate-200 bg-[#020617] p-4 md:p-8 min-h-screen">
-    <div class="max-w-8xl mx-auto">
+    <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="flex items-center justify-between border-b border-slate-800 pb-6 mb-8">
             <div class="flex items-center gap-3">
@@ -26,19 +26,28 @@
                     LINEDATA DEPLOYMENT DASHBOARD
                 </h1>
             </div>
+
+            <!-- Improved View Releases Button -->
+            <a href="releases.html" 
+               class="flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-600 hover:border-red-500/50 rounded-2xl text-sm font-medium transition-all duration-200 group">
+                <i class="fa-solid fa-list-check text-red-400 group-hover:rotate-12 transition-transform"></i>
+                <span>View All Releases</span>
+            </a>
+
             <div class="flex items-center gap-2 text-sm font-mono">
                 <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                 <span class="text-slate-400">Platform Development</span>
                 <span class="text-emerald-400">• LIVE</span>
             </div>
         </div>
+
         <!-- Filters -->
         <div class="mb-8 bg-slate-900/60 border border-slate-800 rounded-2xl p-5">
             <div class="relative mb-4">
                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-500"></i>
-                <input 
-                    id="search" 
-                    type="text" 
+                <input
+                    id="search"
+                    type="text"
                     placeholder="Search client, application, version..."
                     class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-11 py-3 text-sm focus:outline-none">
             </div>
@@ -56,13 +65,14 @@
                     <option value="">All Environments</option>
                 </select>
                 <!-- Clear Filters Button -->
-                <button onclick="clearFilters()" 
+                <button onclick="clearFilters()"
                         class="px-6 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap">
                     <i class="fa-solid fa-rotate-right"></i>
                     Clear Filters
                 </button>
             </div>
         </div>
+
         <!-- Table Container -->
         <div id="tableContainer" class="bg-slate-900/60 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
             <div class="text-center py-16 text-slate-400">
@@ -71,6 +81,7 @@
             </div>
         </div>
     </div>
+
     <script src="app.js"></script>
 </body>
 </html>
