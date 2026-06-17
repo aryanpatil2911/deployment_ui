@@ -1,0 +1,45 @@
+name: Update Releases Index
+
+on:
+  push:
+    paths:
+      - 'App/**'
+  workflow_dispatch:
+
+jobs:
+  update-index:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate index.json with nested paths
+        run: |
+          cd App
+          
+          # Find all .yml files and create full paths (Folder/Filename)
+          find . -name "*.yml" | sed 's|^\./||' | sort > temp_files.txt
+          
+          # Convert to JSON array
+          jq -R -s -c 'split("\n")[:-1]' temp_files.txt > index.json
+          
+          rm temp_files.txt
+          
+          echo "Generated index.json with $(wc -l < index.json) files"
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add App/index.json
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: auto-update App/index.json"
+            git push
+          fiAlso

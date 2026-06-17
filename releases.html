@@ -18,25 +18,17 @@
 </head>
 <body class="text-slate-200 bg-[#020617] p-4 md:p-8 min-h-screen">
     <div class="max-w-7xl mx-auto">
-        <!-- Header -->
         <div class="flex items-center justify-between border-b border-slate-800 pb-6 mb-8">
             <div class="flex items-center gap-3">
                 <i class="fa-solid fa-diagram-project text-red-500 text-3xl"></i>
-                <h1 class="text-3xl font-black tracking-tighter text-white">
-                    LINEDATA RELEASES
-                </h1>
+                <h1 class="text-3xl font-black tracking-tighter text-white">LINEDATA RELEASES</h1>
             </div>
-
-            <!-- Navigation -->
             <div class="flex items-center gap-2 bg-slate-900 border border-slate-700 rounded-2xl p-1">
-                <a href="index.html" 
-                   class="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all hover:bg-slate-800">
+                <a href="index.html" class="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all hover:bg-slate-800">
                     <i class="fa-solid fa-list-check text-red-400"></i>
                     <span>Deployment Dashboard</span>
                 </a>
             </div>
-
-            <!-- Live Status -->
             <div class="flex items-center gap-2 text-sm font-mono">
                 <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                 <span class="text-slate-400">Platform Development</span>
@@ -44,43 +36,34 @@
             </div>
         </div>
 
-        <!-- Filters -->
         <div class="mb-8 bg-slate-900/60 border border-slate-800 rounded-2xl p-5">
             <div class="flex flex-wrap gap-3">
-                <select id="appFilter" onchange="filterReleases()" 
-                        class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-xl text-sm flex-1 min-w-[200px]">
+                <select id="appFilter" onchange="filterReleases()" class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-xl text-sm flex-1 min-w-[200px] cursor-pointer outline-none">
                     <option value="">All Applications</option>
                 </select>
                 <div class="relative flex-1 min-w-[280px]">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-500"></i>
-                    <input id="search" type="text" placeholder="Search versions or filenames..."
-                           onkeyup="filterReleases()" 
-                           class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-11 py-3 text-sm focus:outline-none">
+                    <input id="search" type="text" placeholder="Search versions or filenames..." onkeyup="filterReleases()" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-11 py-3 text-sm focus:outline-none">
                 </div>
+                <button onclick="clearFilters()" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-sm font-medium transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Clear
+                </button>
             </div>
         </div>
 
-        <!-- Releases Grid -->
         <div id="releasesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Populated by JS -->
-        </div>
+            </div>
     </div>
 
-    <!-- View Release Modal -->
     <div id="releaseModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-3xl mx-4 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between border-b border-slate-700 p-6">
-                <h2 id="modalTitle" class="text-2xl font-semibold">Release Details</h2>
-                <button onclick="closeReleaseModal()" class="text-slate-400 hover:text-white text-3xl leading-none">×</button>
+                <h2 id="modalTitle" class="text-2xl font-semibold truncate">Release Details</h2>
+                <button onclick="closeReleaseModal()" class="text-slate-400 hover:text-white text-3xl leading-none">&times;</button>
             </div>
-            <div class="p-6 overflow-auto flex-1 font-mono text-sm bg-slate-950" id="modalContent">
-                <!-- YAML content loaded here -->
-            </div>
+            <div class="p-6 overflow-auto flex-1 font-mono text-sm bg-slate-950" id="modalContent"></div>
             <div class="border-t border-slate-700 p-4 flex justify-end">
-                <button onclick="closeReleaseModal()" 
-                        class="px-8 py-3 bg-slate-800 hover:bg-slate-700 rounded-2xl text-sm font-medium">
-                    Close
-                </button>
+                <button onclick="closeReleaseModal()" class="px-8 py-3 bg-slate-800 hover:bg-slate-700 rounded-2xl text-sm font-medium">Close</button>
             </div>
         </div>
     </div>
@@ -96,85 +79,99 @@
 
             try {
                 const res = await fetch('../App/index.json');
+                if (!res.ok) throw new Error("index.json not found");
                 const files = await res.json();
-                allReleases = files;
 
-                // Populate App Filter
-                const apps = [...new Set(files.map(f => {
-                    const m = f.match(/APP_([A-Z]+)/i);
-                    return m ? m[1] : null;
-                }).filter(Boolean))];
+                allReleases = files.filter(f => typeof f === 'string' && f.endsWith('.yml'));
 
+                // Populate App Filter from actual directory levels
+                const apps = [...new Set(allReleases.map(f => f.split('/')[0]))].sort();
                 const appSelect = document.getElementById('appFilter');
+                
+                // Flush stale entries out safely
+                appSelect.innerHTML = '<option value="">All Applications</option>';
                 apps.forEach(app => {
-                    appSelect.innerHTML += `<option value="${app}">${app}</option>`;
+                    appSelect.innerHTML += `<option value="${app}">${app.replace(/_/g, ' ')}</option>`;
                 });
 
-                renderReleases(files);
+                renderReleases(allReleases);
             } catch (e) {
-                container.innerHTML = `<div class="col-span-full text-red-500 text-center py-16">Failed to load releases</div>`;
+                console.error(e);
+                container.innerHTML = `<div class="col-span-full text-red-500 text-center py-16">Failed to load releases.<br>Check that App/index.json exists.</div>`;
             }
         }
 
         function renderReleases(files) {
             const container = document.getElementById('releasesContainer');
             let html = '';
-            files.forEach(file => {
-                const match = file.match(/APP_([A-Z]+)_([\d.]+)\.yml/i);
+
+            files.forEach(fullPath => {
+                const parts = fullPath.split('/');
+                const fileName = parts.pop();
+
+                const match = fileName.match(/APP_([A-Z]+)_([\d.]+)\.yml/i);
                 if (!match) return;
+
                 const app = match[1];
                 const version = match[2];
 
                 html += `
                     <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 hover:border-red-500/30 transition-all group">
                         <div class="flex justify-between items-start mb-4">
-                            <h3 class="text-xl font-semibold text-white">${app}</h3>
-                            <span class="px-3 py-1 text-xs font-mono bg-slate-800 rounded-full">${version}</span>
+                            <h3 class="text-xl font-semibold text-white tracking-wide">${app}</h3>
+                            <span class="px-3 py-1 text-xs font-mono bg-slate-800 rounded-full border border-slate-700/40 text-red-400 font-bold">${version}</span>
                         </div>
-                        <div class="text-xs text-slate-500 font-mono mb-6">${file}</div>
-                        <button onclick="viewRelease('${file}')" 
-                                class="w-full py-3 text-sm bg-slate-800 hover:bg-slate-700 border border-slate-600 hover:border-red-500 rounded-xl transition-all">
+                        <div class="text-xs text-slate-500 font-mono mb-6 truncate">${fileName}</div>
+                        <button onclick="viewRelease('${fullPath}')" 
+                                class="w-full py-3 text-sm bg-slate-800 hover:bg-slate-700 border border-slate-600 hover:border-red-500 rounded-xl transition-all font-medium">
                             View Release Details
                         </button>
                     </div>`;
             });
-            container.innerHTML = html || `<div class="col-span-full text-center py-16 text-slate-400">No releases found</div>`;
+
+            container.innerHTML = html || `<div class="col-span-full text-center py-16 text-slate-500 font-medium">No releases found matching constraints.</div>`;
         }
 
         function filterReleases() {
-            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const searchTerm = document.getElementById('search').value.toLowerCase().trim();
             const selectedApp = document.getElementById('appFilter').value;
 
-            const filtered = allReleases.filter(file => {
-                const match = file.match(/APP_([A-Z]+)_([\d.]+)\.yml/i);
-                if (!match) return false;
-                const app = match[1];
-                const version = match[2];
-                const matchesApp = !selectedApp || app === selectedApp;
-                const matchesSearch = !searchTerm || 
-                    file.toLowerCase().includes(searchTerm) || 
-                    version.includes(searchTerm);
+            const filtered = allReleases.filter(fullPath => {
+                const parts = fullPath.split('/');
+                const appFolder = parts[0] || ''; // Extracts folder path segments like 'APP_ALPHA'
+
+                // FIXED: Compares appFolder (e.g., 'APP_ALPHA') against the selected drop-down option value directly
+                const matchesApp = !selectedApp || appFolder === selectedApp;
+                const matchesSearch = !searchTerm || fullPath.toLowerCase().includes(searchTerm);
+
                 return matchesApp && matchesSearch;
             });
 
             renderReleases(filtered);
         }
 
-        async function viewRelease(filename) {
+        function clearFilters() {
+            document.getElementById('search').value = '';
+            document.getElementById('appFilter').value = '';
+            filterReleases();
+        }
+
+        async function viewRelease(fullPath) {
             const modal = document.getElementById('releaseModal');
             const content = document.getElementById('modalContent');
             const title = document.getElementById('modalTitle');
 
-            title.textContent = filename;
-            content.innerHTML = `<div class="text-center py-12"><i class="fa-solid fa-circle-notch fa-spin text-2xl"></i><p class="mt-4">Loading release file...</p></div>`;
+            title.textContent = fullPath.split('/').pop();
+            content.innerHTML = `<div class="text-center py-12 text-slate-500"><i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i><p>Streaming layout details...</p></div>`;
             modal.classList.remove('hidden');
 
             try {
-                const res = await fetch(`../App/${filename}`);
+                const res = await fetch(`../App/${fullPath}`);
+                if (!res.ok) throw new Error("File not found");
                 const yamlText = await res.text();
-                content.innerHTML = `<pre class="bg-slate-950 p-6 rounded-2xl overflow-auto text-emerald-300 whitespace-pre-wrap text-xs leading-relaxed">${yamlText}</pre>`;
+                content.innerHTML = `<pre class="text-emerald-400 whitespace-pre-wrap text-xs leading-relaxed font-mono select-text bg-slate-950 p-2 rounded border border-slate-800">${yamlText}</pre>`;
             } catch (e) {
-                content.innerHTML = `<div class="text-red-500 text-center py-12">Failed to load file</div>`;
+                content.innerHTML = `<div class="text-red-500 text-center py-12">Failed to load asset layout payload.<br><small class="text-xs text-slate-600">${fullPath}</small></div>`;
             }
         }
 
@@ -182,7 +179,6 @@
             document.getElementById('releaseModal').classList.add('hidden');
         }
 
-        // Load on start
         window.onload = loadReleases;
     </script>
 </body>
