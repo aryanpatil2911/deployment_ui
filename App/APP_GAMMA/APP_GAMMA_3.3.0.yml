@@ -1,0 +1,18 @@
+# Linedata Release Manifest - APP_GAMMA v3.3.0
+release:
+  version: "3.3.0"
+  date: "2026-06-17"
+  environment: "UAT"
+
+application:
+  name: APP_GAMMA
+  client: CLIENT_A
+  description: APP_GAMMA Release
+
+changes:
+  - Fixed critical bug
+
+metadata:
+  build_id: "build-1781710416948"
+  triggered_by: "releases-dashboard"
+  notes: "Generated via Linedata Releases Portal"
