@@ -28,8 +28,7 @@
                     <i class="fa-solid fa-list-check text-red-400"></i>
                     <span>Deployment Dashboard</span>
                 </a>
-                <button onclick="showCreateModal()" 
-                        class="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 rounded-xl text-sm font-medium transition-all">
+                <button onclick="showCreateModal()" class="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 rounded-xl text-sm font-medium transition-all">
                     <i class="fa-solid fa-plus"></i>
                     <span>New Release</span>
                 </button>
@@ -43,7 +42,7 @@
 
         <div class="mb-8 bg-slate-900/60 border border-slate-800 rounded-2xl p-5">
             <div class="flex flex-wrap gap-3">
-                <select id="appFilter" onchange="filterReleases()" class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-xl text-sm flex-1 min-w-[200px] cursor-pointer outline-none text-slate-300">
+                <select id="appFilter" onchange="filterReleases()" class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-xl text-sm flex-1 min-w-[200px] text-slate-300 cursor-pointer outline-none">
                     <option value="">All Applications</option>
                 </select>
                 <div class="relative flex-1 min-w-[280px]">
@@ -82,7 +81,7 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm text-slate-400 mb-1">Application</label>
-                        <select id="newApp" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 outline-none">
+                        <select id="newApp" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 outline-none cursor-pointer">
                             <option value="APP_ALPHA">APP_ALPHA</option>
                             <option value="APP_BETA">APP_BETA</option>
                             <option value="APP_GAMMA">APP_GAMMA</option>
@@ -96,7 +95,7 @@
                 </div>
                 <div>
                     <label class="block text-sm text-slate-400 mb-1">Environment</label>
-                    <select id="newEnv" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 outline-none">
+                    <select id="newEnv" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 outline-none cursor-pointer">
                         <option value="UAT">UAT</option>
                         <option value="PROD">PROD</option>
                     </select>
@@ -113,10 +112,60 @@
         </div>
     </div>
 
+    <div id="editModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-5xl mx-4 h-[85vh] flex flex-col overflow-hidden shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-700 p-5 bg-slate-950/40">
+                <div>
+                    <h2 id="editModalTitle" class="text-xl font-bold text-white">Edit Release Configuration</h2>
+                    <p id="editModalSubtitle" class="text-[11px] font-mono text-slate-500 mt-0.5 truncate max-w-md md:max-w-xl"></p>
+                </div>
+                <button onclick="closeEditModal()" class="text-slate-400 hover:text-white text-3xl leading-none">&times;</button>
+            </div>
+            
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-slate-900">
+                <div class="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-slate-800 p-5 space-y-4 overflow-auto text-xs bg-slate-900/40">
+                    <div class="space-y-1.5">
+                        <span class="text-[10px] font-black tracking-wider text-amber-500 uppercase flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-info"></i> Validation Guidelines
+                        </span>
+                        <p class="text-slate-400 leading-relaxed">Ensure structural layout schema spacing constraints remain aligned. Maintain strict YAML list syntax format elements below change definitions.</p>
+                    </div>
+                    <div class="border-t border-slate-800 pt-3 space-y-2.5">
+                        <div>
+                            <span class="text-slate-500 font-mono block">SCHEMA TARGET:</span>
+                            <span class="font-mono text-slate-300 font-bold block mt-0.5">Linedata Release Manifest</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 font-mono block">SYNTAX ENGING:</span>
+                            <span class="text-emerald-400 font-mono bg-emerald-500/5 border border-emerald-500/10 px-1.5 py-0.5 rounded inline-block mt-0.5">YAML Lint Active</span>
+                        </div>
+                    </div>
+                    <div id="validationWarning" class="hidden p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl space-y-1 text-[11px]">
+                        <span class="font-bold uppercase block tracking-wide"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Format Error</span>
+                        <p>File structure template content fields cannot be processed as blank lines.</p>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex flex-col bg-slate-950 p-4">
+                    <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 mb-2 px-1">
+                        <span>WORKSPACE SOURCE CODE EDITOR</span>
+                        <span>UTF-8</span>
+                    </div>
+                    <textarea id="editTextarea" class="w-full flex-1 bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-emerald-400 focus:border-red-500/40 outline-none resize-none leading-relaxed tracking-wide shadow-inner"></textarea>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-700 p-4 flex gap-3 justify-end bg-slate-950/40">
+                <button onclick="closeEditModal()" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">Cancel</button>
+                <button onclick="saveEditedYAML()" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <div id="yamlPreviewModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-3xl mx-4 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between border-b border-slate-700 p-6">
-                <h2 class="text-2xl font-semibold">Generated Release YAML</h2>
+                <h2 class="text-2xl font-semibold">Generated / Updated YAML</h2>
                 <button onclick="closeYamlPreview()" class="text-slate-400 hover:text-white text-3xl leading-none">&times;</button>
             </div>
             <div class="p-6 overflow-auto flex-1 font-mono text-xs bg-slate-950" id="yamlContent"></div>
@@ -125,7 +174,7 @@
                     <i class="fa-solid fa-copy"></i> Copy
                 </button>
                 <a id="githubCreateLink" href="#" target="_blank" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-2xl font-medium flex items-center gap-2 transition-all">
-                    <i class="fa-solid fa-github"></i> Create on GitHub
+                    <i class="fa-solid fa-github"></i> Update on GitHub
                 </a>
                 <button onclick="closeYamlPreview()" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-2xl">Close</button>
             </div>
@@ -137,19 +186,27 @@
             <i class="fa-solid fa-circle-check"></i>
         </div>
         <div>
-            <h4 class="text-xs font-black text-white uppercase tracking-wider">System Action Complete</h4>
-            <p class="text-[11px] text-slate-400 mt-0.5 font-medium">YAML structure copied to system clipboard successfully.</p>
+            <h4 class="text-xs font-black text-white uppercase tracking-wider">Action Complete</h4>
+            <p class="text-[11px] text-slate-400 mt-0.5 font-medium">Release manifest footprint successfully stored on system clipboard.</p>
         </div>
     </div>
 
     <script>
         let allReleases = [];
+        let currentEditPath = null;
 
-        // Helper to extract clean app folder structures
         function getAppFolder(fullPath) {
             const parts = fullPath.split('/');
             if (parts[0] === 'App') parts.shift();
             return parts[0] || '';
+        }
+
+        function triggerSystemToast() {
+            const toast = document.getElementById('toastNotification');
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3500);
         }
 
         async function loadReleases() {
@@ -164,13 +221,10 @@
                 const files = await res.json();
                 allReleases = files.filter(f => typeof f === 'string' && f.endsWith('.yml'));
 
-                // FIXED: Populate dropdown using getAppFolder matching data properties perfectly
                 const apps = [...new Set(allReleases.map(f => getAppFolder(f)))].sort();
                 const appSelect = document.getElementById('appFilter');
                 appSelect.innerHTML = '<option value="">All Applications</option>';
-                apps.forEach(app => {
-                    appSelect.innerHTML += `<option value="${app}">${app}</option>`;
-                });
+                apps.forEach(app => appSelect.innerHTML += `<option value="${app}">${app}</option>`);
 
                 renderReleases(allReleases);
             } catch (e) {
@@ -197,10 +251,10 @@
                             <span class="px-3 py-1 text-xs font-mono bg-slate-800 rounded-full border border-slate-700/60 text-red-400 font-bold">${version}</span>
                         </div>
                         <div class="text-xs text-slate-500 font-mono mb-6 truncate">${fileName}</div>
-                        <button onclick="viewRelease('${fullPath}')" 
-                                class="w-full py-3 text-sm bg-slate-800 hover:bg-slate-700 border border-slate-600 hover:border-red-500 rounded-xl transition-all font-medium">
-                            View Release Details
-                        </button>
+                        <div class="flex gap-2">
+                            <button onclick="viewRelease('${fullPath}')" class="flex-1 py-2.5 text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl font-bold uppercase tracking-wider transition-all">View</button>
+                            <button onclick="editRelease('${fullPath}')" class="flex-1 py-2.5 text-xs bg-amber-600/10 hover:bg-amber-600 border border-amber-500/20 hover:border-amber-500 text-amber-400 hover:text-white rounded-xl font-bold uppercase tracking-wider transition-all">Edit</button>
+                        </div>
                     </div>`;
             });
             container.innerHTML = html || `<div class="col-span-full text-center py-16 text-slate-500 font-medium">No releases found</div>`;
@@ -209,15 +263,12 @@
         function filterReleases() {
             const searchTerm = document.getElementById('search').value.toLowerCase().trim();
             const selectedApp = document.getElementById('appFilter').value;
-
             const filtered = allReleases.filter(fullPath => {
                 const appFolder = getAppFolder(fullPath);
-                // FIXED: Direct exact string equivalence match evaluation boundary condition
                 const matchesApp = !selectedApp || appFolder === selectedApp;
                 const matchesSearch = !searchTerm || fullPath.toLowerCase().includes(searchTerm);
                 return matchesApp && matchesSearch;
             });
-
             renderReleases(filtered);
         }
 
@@ -232,18 +283,16 @@
             const content = document.getElementById('modalContent');
             const title = document.getElementById('modalTitle');
             title.textContent = fullPath.split('/').pop();
-            content.innerHTML = `<div class="text-center py-12 text-slate-500"><i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i><p>Loading release file...</p></div>`;
+            content.innerHTML = `<div class="text-center py-12 text-slate-600"><i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i><p>Loading mapping data...</p></div>`;
             modal.classList.remove('hidden');
-
             try {
-                // FIXED: Normalized fetch operations routing layers cleanly
                 const cleanPath = fullPath.startsWith('App/') ? fullPath.substring(4) : fullPath;
                 const res = await fetch(`../App/${cleanPath}`);
-                if (!res.ok) throw new Error("File not found");
+                if (!res.ok) throw new Error();
                 const yamlText = await res.text();
-                content.innerHTML = `<pre class="text-emerald-400 whitespace-pre-wrap text-xs leading-relaxed font-mono select-text bg-slate-950 p-4 rounded border border-slate-800">${yamlText}</pre>`;
+                content.innerHTML = `<pre class="text-emerald-400 whitespace-pre-wrap text-xs leading-relaxed font-mono p-2 bg-slate-950 rounded border border-slate-800">${yamlText}</pre>`;
             } catch (e) {
-                content.innerHTML = `<div class="text-red-500 text-center py-12">Failed to load file.<br><small class="text-xs text-slate-600">${fullPath}</small></div>`;
+                content.innerHTML = `<div class="text-red-500 text-center py-12 font-bold">Failed to load content streams.</div>`;
             }
         }
 
@@ -255,16 +304,45 @@
             document.getElementById('createModal').classList.remove('hidden');
         }
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeReleaseModal();
-                closeCreateModal();
-                closeYamlPreview();
-            }
-        });
-
         function closeCreateModal() {
             document.getElementById('createModal').classList.add('hidden');
+        }
+
+        async function editRelease(fullPath) {
+            currentEditPath = fullPath;
+            document.getElementById('validationWarning').classList.add('hidden');
+            try {
+                const cleanPath = fullPath.startsWith('App/') ? fullPath.substring(4) : fullPath;
+                const res = await fetch(`../App/${cleanPath}`);
+                if (!res.ok) throw new Error();
+                const yamlText = await res.text();
+
+                document.getElementById('editModalSubtitle').textContent = `Target File Path: App/${cleanPath}`;
+                document.getElementById('editModal').classList.remove('hidden');
+                document.getElementById('editTextarea').value = yamlText;
+            } catch (e) {
+                document.getElementById('validationWarning').classList.remove('hidden');
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            currentEditPath = null;
+        }
+
+        function saveEditedYAML() {
+            const updatedYAML = document.getElementById('editTextarea').value.trim();
+            if (!updatedYAML) {
+                document.getElementById('validationWarning').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('yamlContent').innerHTML = `<pre class="text-emerald-400 whitespace-pre-wrap text-xs leading-relaxed font-mono p-4 bg-slate-950 rounded border border-slate-800">${updatedYAML}</pre>`;
+            document.getElementById('githubCreateLink').href = `https://github.com/sugaredcookie/deployement_ui/edit/main/${currentEditPath}`;
+            document.getElementById('githubCreateLink').innerHTML = `<i class="fa-solid fa-edit"></i> Update File on GitHub`;
+
+            closeEditModal();
+            document.getElementById('yamlPreviewModal').classList.remove('hidden');
         }
 
         function generateAndShowYAML() {
@@ -273,9 +351,7 @@
             const env = document.getElementById('newEnv').value;
             const changesText = document.getElementById('newChanges').value.trim();
 
-            const changes = changesText 
-                ? changesText.split('\n').map(line => `  - ${line.trim()}`).join('\n') 
-                : '  - Initial release';
+            const changes = changesText ? changesText.split('\n').map(line => `  - ${line.trim()}`).join('\n') : '  - Initial release';
 
             const yaml = `# Linedata Release Manifest - ${app} v${version}
 release:
@@ -297,9 +373,9 @@ metadata:
   notes: "Generated via Linedata Releases Portal"
 `;
 
-            document.getElementById('yamlContent').innerHTML = `<pre class="text-emerald-400 whitespace-pre-wrap text-xs leading-relaxed font-mono select-text bg-slate-950 p-4 rounded border border-slate-800">${yaml}</pre>`;
-            document.getElementById('githubCreateLink').href = 
-                `https://github.com/sugaredcookie/deployement_ui/new/main/App/${app}?filename=${app}_${version}.yml`;
+            document.getElementById('yamlContent').innerHTML = `<pre class="text-emerald-400 whitespace-pre-wrap text-xs leading-relaxed font-mono p-4 bg-slate-950 rounded border border-slate-800">${yaml}</pre>`;
+            document.getElementById('githubCreateLink').href = `https://github.com/sugaredcookie/deployement_ui/new/main/App/${app}?filename=${app}_${version}.yml`;
+            document.getElementById('githubCreateLink').innerHTML = `<i class="fa-solid fa-github"></i> Create on GitHub`;
 
             closeCreateModal();
             document.getElementById('yamlPreviewModal').classList.remove('hidden');
@@ -309,18 +385,22 @@ metadata:
             const preElement = document.getElementById('yamlContent').querySelector('pre');
             const yaml = preElement ? preElement.textContent : '';
             navigator.clipboard.writeText(yaml).then(() => {
-                // FIXED: Replaced standard generic warning alerts with a custom notification toast banner
-                const toast = document.getElementById('toastNotification');
-                toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
-                setTimeout(() => {
-                    toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
-                }, 3500);
+                triggerSystemToast();
             });
         }
 
         function closeYamlPreview() {
             document.getElementById('yamlPreviewModal').classList.add('hidden');
         }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeReleaseModal();
+                closeCreateModal();
+                closeEditModal();
+                closeYamlPreview();
+            }
+        });
 
         window.onload = loadReleases;
     </script>
