@@ -212,8 +212,6 @@
         }
 
         window.triggerPipelineAction = function(type, client, project, sourceEnv, targetEnv, releaseId, version) {
-            // FIXED: Removed GitHub Issue Template formatting strings completely.
-            // Dynamically constructs the fallback file link target mapping coordinates inside the repo.
             const targetWorkflowPath = `https://github.com/sugaredcookie/linedata_task_1/actions/workflows/deployment.yml?query=branch%3Amain+event%3Aworkflow_dispatch`;
             window.open(targetWorkflowPath, '_blank');
         };
