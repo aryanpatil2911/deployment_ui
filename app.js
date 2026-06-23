@@ -1,4 +1,4 @@
-const deploymentLogsPath = "../applications";
+const deploymentLogsPath = "applications";
 const deploymentLogsIndexUrl = `${deploymentLogsPath}/index.json`;
 
 let deployments = [];
