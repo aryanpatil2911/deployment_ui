@@ -38,7 +38,7 @@ jobs:
 
         with:
 
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.RELEASE_PAT }}
 
           script: |
 
