@@ -21,6 +21,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 
 jobs:
@@ -95,3 +96,26 @@ jobs:
 
 
             console.log(`Updated: ${path}`);
+
+
+
+      - name: "Trigger Index Update"
+        uses: actions/github-script@v7
+
+        with:
+
+          github-token: ${{ github.token }}
+
+          script: |
+
+            await github.rest.actions.createWorkflowDispatch({
+
+              owner: context.repo.owner,
+
+              repo: context.repo.repo,
+
+              workflow_id: 'update-releases-index.yml',
+
+              ref: 'main'
+
+            });
