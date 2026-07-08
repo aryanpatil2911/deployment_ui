@@ -5,7 +5,7 @@ service:
     - type: api
       component: Recon_API
       name: Base.Recon.API
-      version: 2.26.0428.493
+      version: 2.26.0428.494
       client_code: Base
       package: Base.Recon.Web.Api.2.26.0428.494.nupkg
       path: G:publishSFTPDownloadRecon
