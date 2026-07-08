@@ -1,9 +1,6 @@
 name: Update Releases Index
 
 on:
-  push:
-    paths:
-      - 'App/**'
   workflow_dispatch:
 
 permissions:
@@ -28,7 +25,8 @@ jobs:
 
           $index = @{}
 
-          $files = Get-ChildItem "App" -Recurse -Filter "*.yml" |
+          $files = git diff --name-only HEAD~1 HEAD |
+                   Where-Object { $_ -match "^App/.+\.yml$" }
                    Sort-Object FullName
 
           foreach ($file in $files) {
