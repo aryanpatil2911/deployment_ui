@@ -54,7 +54,7 @@ jobs:
               }
           }
 
-          $index | ConvertTo-Json -Depth 10 -Compress | Set-Content "App/index.json"
+          $index | ConvertTo-Json -Depth 10 | Set-Content "App/index.json"
 
           Write-Host "Generated App/index.json"
           Get-Content "App/index.json"
