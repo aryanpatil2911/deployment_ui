@@ -32,7 +32,7 @@
 <div class="flex items-center justify-between border-b border-slate-800 pb-5 mb-8">
 
         <h1 class="text-xl font-black tracking-tight text-white">
-            CONFIGURATION 
+            LINEDATA CONFIGURATION DASHBOARD
         </h1>
 
         <a href="index.html"
@@ -347,6 +347,7 @@ function closePreviewModal(){
     document.getElementById("previewModal").classList.add("hidden");
 }
 
+
 async function submitJson(){
 
     const pat = localStorage.getItem("gh_deployment_pat");
@@ -356,6 +357,7 @@ async function submitJson(){
         return;
     }
 
+    const currentUser = localStorage.getItem("gh_deployment_user") || localStorage.getItem("gh_username") || localStorage.getItem("github_username") || "unknown";
 
     const filePath =
     `Client/${client}/${env}/${app}/${currentFileName}`;
@@ -367,6 +369,7 @@ async function submitJson(){
 
     const res = await fetch(
     `https://api.github.com/repos/${githubRepoOwner}/${githubRepoName}/actions/workflows/${githubWorkflowFile}/dispatches`,
+
     {
         method:"POST",
 
@@ -382,7 +385,11 @@ async function submitJson(){
             inputs:{
                 filePath:filePath,
                 content:content,
-                commitMessage:"Update configuration JSON"
+                commitMessage:`Update ${currentFileName} from config dashboard`,
+                client:client,
+                environment:env,
+                application:app,
+                updatedBy:currentUser
             }
 
         })
