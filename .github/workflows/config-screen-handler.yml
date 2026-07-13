@@ -106,8 +106,8 @@ jobs:
               return;
 
             }
-
-            const commitResponse = await github.rest.repos.updateFileContents({
+            
+            const commitResponse = await github.rest.repos.createOrUpdateFileContents({
 
               owner: context.repo.owner,
 
@@ -160,7 +160,7 @@ jobs:
               console.log("Creating new configuration log file");
             }
 
-            await github.rest.repos.updateFileContents({
+            await github.rest.repos.createOrUpdateFileContents({
               owner: context.repo.owner,
               repo: context.repo.repo,
               path: logFilePath,
