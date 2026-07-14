@@ -382,12 +382,14 @@ async function submitJson(){
 
             ref: githubWorkflowRef,
 
-            inputs:{
-                filePath:filePath,
-                content:content,
-                commitMessage:"Update configuration JSON"
-            }
-
+            inputs: {
+                filePath: filePath,
+                content: content,
+                commitMessage: `Update configuration JSON (${client}/${env}/${app})`,
+                client: client,
+                environment: env,
+                application: app
+}
         })
     });
 
